@@ -1,7 +1,6 @@
 import base64
 import json
 import re
-import tempfile
 from base64 import b64encode
 
 import cv2
@@ -9,6 +8,9 @@ import easyocr
 import google.generativeai as genai
 import pytesseract
 import requests
+from azure.ai.vision.imageanalysis import ImageAnalysisClient
+from azure.ai.vision.imageanalysis.models import VisualFeatures
+from azure.core.credentials import AzureKeyCredential
 from doctr.io import DocumentFile
 from doctr.models import kie_predictor, ocr_predictor
 from openai import OpenAI
@@ -29,6 +31,7 @@ from ocr_pre_processing import remove_background
 OPENAI_API_KEY = "<insert here your OpenAI API Key>"
 GOOGLE_VISION_API_KEY = "<insert here your Google Vision API Key>"
 GEMINI_API_KEY = "<insert here your Gemini API Key>"
+AZURE_VISION_API_KEY = "A82yyJrI2KAZMDkC74XVlZAyHXhpHhtFOGokQvFDA7TigF6s7CsUJQQJ99BAACYeBjFXJ3w3AAAEACOGFFO4"
 
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -43,6 +46,34 @@ class Gemini:
         response = model.generate_content([prompt, sample_file])
 
         return response.text
+
+
+class AzureVisionAI:
+    def to_text(self, image_path):
+        with open(image_path, "rb") as f:
+            image_data = f.read()
+
+        region = "eastus"
+        endpoint = "https://ocrapirest.cognitiveservices.azure.com/"
+
+        client = ImageAnalysisClient(
+            endpoint=endpoint,
+            credential=AzureKeyCredential(AZURE_VISION_API_KEY),
+            region=region,
+        )
+
+        response = client.analyze(
+            image_data,
+            visual_features=[VisualFeatures.READ],
+        )
+
+        lines = []
+
+        if response.read is not None:
+            for line in response.read.blocks[0].lines:
+                lines.append(line.text)
+
+        return "\n".join(lines)
 
 
 class GoogleVisionAI:
@@ -237,23 +268,22 @@ def regex(text):
     print(colored("---------------------------", "light_green"))
 
 
-image_path = "images/7.png"
+image_path = "images/1.jpg"
 
 
 engines = [
     # Generative AI
     ("OpenAI", OpenAIOCR()),
-    ("Gemini", Gemini()), 
-
+    ("Gemini", Gemini()),
     # Bibliotecas
-    # ("DocOCR KIE", DocOCRKIE()),
+    ("DocOCR KIE", DocOCRKIE()),
     ("DocOCR", DocOCR()),
-    #("Surya", Surya()),
-    # ("EasyOCR", EasyOCR()),
+    ("Surya", Surya()),
+    ("EasyOCR", EasyOCR()),
     ("Tesseract", Tesseract()),
-
     # Vision AI
     ("Google Vision AI", GoogleVisionAI()),
+    ("Azure Vision AI", AzureVisionAI()),
 ]
 
 

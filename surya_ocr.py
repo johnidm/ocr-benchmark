@@ -29,6 +29,7 @@ def to_text(image_path: str) -> str:
 
     return " ".join(text)
 
+
 images_path = "images/1.jpg"
 
 text = to_text(images_path)

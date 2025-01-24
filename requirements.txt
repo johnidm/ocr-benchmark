@@ -7,4 +7,4 @@ pytesseract
 openai
 matplotlib
 google.generativeai
-
+azure-ai-vision-imageanalysis

@@ -100,8 +100,8 @@ def remove_background(image):
 
     return result
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     image_path = "images/1.jpg"
 
     preprocessed = preprocess_image_for_ocr(image_path)
@@ -123,4 +123,3 @@ if __name__ == "__main__":
     print("original")
     text = pytesseract.image_to_string(preprocessed, config=config)
     print(colored(text, "green"))
-

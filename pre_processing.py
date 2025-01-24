@@ -77,6 +77,7 @@ def remove_background(image):
 
     return result
 
+
 # template matching
 def match_template(image, template):
     return cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
