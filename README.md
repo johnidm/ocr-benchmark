@@ -60,6 +60,7 @@ The project includes implementations for the following tool to use for OCR:
 ### Vision AI
 
 - [Google Vision AI](https://cloud.google.com/vision?hl=en)
+- [Azure Vision AI](https://azure.microsoft.com/en-us/products/ai-services/ai-vision)
 
 ### Open Source Libraries
 
