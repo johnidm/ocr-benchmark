@@ -31,7 +31,7 @@ from ocr_pre_processing import remove_background
 OPENAI_API_KEY = "<insert here your OpenAI API Key>"
 GOOGLE_VISION_API_KEY = "<insert here your Google Vision API Key>"
 GEMINI_API_KEY = "<insert here your Gemini API Key>"
-AZURE_VISION_API_KEY = "A82yyJrI2KAZMDkC74XVlZAyHXhpHhtFOGokQvFDA7TigF6s7CsUJQQJ99BAACYeBjFXJ3w3AAAEACOGFFO4"
+AZURE_VISION_API_KEY = "<insert here your Azure Vision API Key>"
 
 
 genai.configure(api_key=GEMINI_API_KEY)
