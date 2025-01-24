@@ -1,18 +1,22 @@
 import base64
 import json
+import os
 import re
 from base64 import b64encode
 
 import cv2
 import easyocr
-import google.generativeai as genai # https://cloud.google.com/vision/docs/drag-and-drop?hl=en
+import google.generativeai as genai  # https://cloud.google.com/vision/docs/drag-and-drop?hl=en
 import pytesseract
 import requests
-from azure.ai.vision.imageanalysis import ImageAnalysisClient # https://portal.vision.cognitive.azure.com/demo/extract-text-from-images
+from azure.ai.vision.imageanalysis import (
+    ImageAnalysisClient,  # https://portal.vision.cognitive.azure.com/demo/extract-text-from-images
+)
 from azure.ai.vision.imageanalysis.models import VisualFeatures
 from azure.core.credentials import AzureKeyCredential
 from doctr.io import DocumentFile
 from doctr.models import kie_predictor, ocr_predictor
+from google.cloud import vision
 from openai import OpenAI
 from PIL import Image
 from surya.model.detection.model import (
@@ -29,10 +33,10 @@ from termcolor import colored
 from ocr_pre_processing import remove_background
 
 OPENAI_API_KEY = "<insert here your OpenAI API Key>"
-GOOGLE_VISION_API_KEY = "<insert here your Google Vision API Key>"
 GEMINI_API_KEY = "<insert here your Gemini API Key>"
 AZURE_VISION_API_KEY = "<insert here your Azure Vision API Key>"
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account-file.json"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -78,42 +82,24 @@ class AzureVisionAI:
 
 class GoogleVisionAI:
     def to_text(self, image_path):
-        with open(image_path, "rb") as f:
-            content = b64encode(f.read()).decode()
+        client = vision.ImageAnnotatorClient()
 
-            payload = {
-                "image": {
-                    "content": content,
-                },
-                "features": [
-                    {
-                        "type": "DOCUMENT_TEXT_DETECTION",
-                        "maxResults": 50,
-                    }
-                ],
-            }
+        with open(image_path, "rb") as image_file:
+            content = image_file.read()
 
-        data = json.dumps({"requests": payload}).encode()
+        image = vision.Image(content=content)
 
-        response = requests.post(
-            url="https://vision.googleapis.com/v1/images:annotate",
-            data=data,
-            params={
-                "key": GOOGLE_VISION_API_KEY,
-            },
-            headers={
-                "Content-Type": "application/json",
-            },
-        )
+        response = client.text_detection(image=image)
 
-        if not response.ok:
-            raise Exception(
-                f"Status Code: {response.status_code} - Reason {response.text}"
-            )
+        if response.error.message:
+            raise Exception(f"{response.error.message}")
 
-        results = response.json()["responses"][0]
+        texts = []
 
-        return results["fullTextAnnotation"]["text"]
+        for text in response.text_annotations:
+            texts.append(text.description)
+
+        return " ".join(texts)
 
 
 class OpenAIOCR:

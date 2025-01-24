@@ -8,3 +8,4 @@ openai
 matplotlib
 google.generativeai
 azure-ai-vision-imageanalysis
+google-cloud-vision
