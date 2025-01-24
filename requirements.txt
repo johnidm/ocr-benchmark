@@ -1,0 +1,10 @@
+surya-ocr
+Pillow
+python-doctr
+easyocr
+termcolor
+pytesseract
+openai
+matplotlib
+google.generativeai
+
