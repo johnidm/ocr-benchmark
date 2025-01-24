@@ -5,10 +5,10 @@ from base64 import b64encode
 
 import cv2
 import easyocr
-import google.generativeai as genai
+import google.generativeai as genai # https://cloud.google.com/vision/docs/drag-and-drop?hl=en
 import pytesseract
 import requests
-from azure.ai.vision.imageanalysis import ImageAnalysisClient
+from azure.ai.vision.imageanalysis import ImageAnalysisClient # https://portal.vision.cognitive.azure.com/demo/extract-text-from-images
 from azure.ai.vision.imageanalysis.models import VisualFeatures
 from azure.core.credentials import AzureKeyCredential
 from doctr.io import DocumentFile
